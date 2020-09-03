@@ -6,9 +6,10 @@ namespace GameOfLife
 {
     public class Board
     {
-        public int Height { get; set; }
-        public int Width { get; set; }
-        public int[,] BoardState;
+        public int Height { get; private set; }
+        public int Width { get; private set; }
+        private int[,] BoardState;
+        private int[,] NewBoardState;
         public Board(int height, int width)
         {
             Height = height;
@@ -21,7 +22,9 @@ namespace GameOfLife
             //list will hold alive and dead cells
             //Alive = 1, dead = 0
             BoardState = new int[Height, Width];
-            Random random = new Random();
+            //seed 1 sucks to test with on 5x5
+            //I think row 8 column five should go from dead to live
+            Random random = new Random(2);
             int cellState;
             for (int cellRow = 0; cellRow < Height; cellRow++)
             {
@@ -54,6 +57,7 @@ namespace GameOfLife
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine();
         }
 
 
@@ -64,46 +68,101 @@ namespace GameOfLife
         /// Any dead cell with exactly 3 live neighbors becomes alive
         /// </summary>
         /// 
-        private void NextBoardState()
+        public void NextBoardState()
         {
-
+            CheckAllDirections();
         }
-        /*
+
         private void CheckAllDirections()
         {
-            int aliveCount = 0;
-            int deadCount = 0;
-            for (int row = 0; row < Height; row++)
+            NewBoardState = new int[Height, Width];
+            for (int row = 1; row < Height - 1; row++)
             {
-                //List<int> cellsInRow = BoardState[row];
-                for (int column = 0; column < Width; column++)
+                for (int column = 1; column < Width - 1; column++)
                 {
-                    if (IsAlive(cellsInRow[column]))
+                    int aliveCount = 0;
+                    int deadCount = 0;
+                    // loop through all surrounding cells from given starting index
+                    if (IsAlive(BoardState[row - 1, column - 1]))
                     {
-                        // loop through all surrounding cells from given starting index
-
-                        // add up the alive cells
-
-                        // add up the dead cells
-
-                        // Any live cell with 0 or 1 live neighbors becomes dead
-
-                        // Any live cell with 2 or 3 live neighbors stays alive
-
-                        // Any live cell with more than 3 live neighbors becomes dead
-
+                        aliveCount++;
                     }
                     else
+                        deadCount++;
+                    if (IsAlive(BoardState[row - 1, column]))
                     {
-                        // Any dead cell with exactly 3 live neighbors becomes alive
-
+                        aliveCount++;
                     }
+                    else
+                        deadCount++;
+                    if (IsAlive(BoardState[row - 1, column + 1]))
+                    {
+                        aliveCount++;
+                    }
+                    else
+                        deadCount++;
+                    if (IsAlive(BoardState[row, column + 1]))
+                    {
+                        aliveCount++;
+                    }
+                    else
+                        deadCount++;
+                    if (IsAlive(BoardState[row + 1, column + 1]))
+                    {
+                        aliveCount++;
+                    }
+                    else
+                        deadCount++;
+                    if (IsAlive(BoardState[row + 1, column]))
+                    {
+                        aliveCount++;
+                    }
+                    else
+                        deadCount++;
+                    if (IsAlive(BoardState[row + 1, column - 1]))
+                    {
+                        aliveCount++;
+                    }
+                    else
+                        deadCount++;
+                    if (IsAlive(BoardState[row, column - 1]))
+                    {
+                        aliveCount++;
+                    }
+                    else
+                        deadCount++;
+
+                    // add up the alive cells
+
+                    // add up the dead cells
+                    if (IsAlive(BoardState[row, column]) && aliveCount <= 1 || IsAlive(BoardState[row, column]) && aliveCount >= 3)
+                    {
+
+                        // Any live cell with 0 or 1 live neighbors becomes dead
+                        // Any live cell with more than 3 live neighbors becomes dead
+                        NewBoardState[row, column] = 0;
+                        // Any live cell with 2 or 3 live neighbors stays alive
+                        //do nothing since it's already alive
+                    }
+                    // Any dead cell with exactly 3 live neighbors becomes alive
+
+
+                    else if (!IsAlive(BoardState[row, column]) && aliveCount == 3)
+                    {
+                        NewBoardState[row, column] = 1;
+                    }
+
+                    else
+                    {
+                        NewBoardState[row, column] = BoardState[row, column];
+                    }
+
                 }
             }
+            BoardState = NewBoardState;
         }
-        */
 
-        public bool IsAlive(int value)
+        private bool IsAlive(int value)
         {
             return value == 1;
         }
