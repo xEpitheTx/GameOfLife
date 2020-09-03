@@ -8,23 +8,41 @@ namespace GameOfLife
     {
         static void Main(string[] args)
         {
-            Board board = new Board(10, 10);
+            Board board = new Board(15, 15);
+            /*
+            while (true)
+            {
+                board.PrintBoardState();
+                Thread.Sleep(1000);
+                board.NextBoardState();
+                Console.Clear();
+            }
+            */
+
+            
+            //testing pattern
             board.PrintBoardState();
             Thread.Sleep(300);
             board.NextBoardState();
+            //Console.Clear();
             board.PrintBoardState();
             Thread.Sleep(300);
             board.NextBoardState();
+            //Console.Clear();
             board.PrintBoardState();
             Thread.Sleep(300);
             board.NextBoardState();
+            //Console.Clear();
             board.PrintBoardState();
             Thread.Sleep(300);
             board.NextBoardState();
+            //Console.Clear();
             board.PrintBoardState();
             Thread.Sleep(300);
             board.NextBoardState();
+            //Console.Clear();
             board.PrintBoardState();
+            
         }
     }
 }

@@ -19,12 +19,9 @@ namespace GameOfLife
 
         public int[,] InitializeBoardState()
         {
-            //list will hold alive and dead cells
             //Alive = 1, dead = 0
             BoardState = new int[Height, Width];
-            //seed 1 sucks to test with on 5x5
-            //I think row 8 column five should go from dead to live
-            Random random = new Random(2);
+            Random random = new Random(1);
             int cellState;
             for (int cellRow = 0; cellRow < Height; cellRow++)
             {
@@ -83,58 +80,19 @@ namespace GameOfLife
                     int aliveCount = 0;
                     int deadCount = 0;
                     // loop through all surrounding cells from given starting index
-                    if (IsAlive(BoardState[row - 1, column - 1]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row - 1, column]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row - 1, column + 1]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row, column + 1]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row + 1, column + 1]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row + 1, column]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row + 1, column - 1]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
-                    if (IsAlive(BoardState[row, column - 1]))
-                    {
-                        aliveCount++;
-                    }
-                    else
-                        deadCount++;
 
-                    // add up the alive cells
-
-                    // add up the dead cells
+                    for (int i = -1; i <= 1; i++)
+                    {
+                        for (int j = -1; j <= 1; j++)
+                        {
+                            if (IsAlive(BoardState[row + i, column + j]) && (i != 0 || j != 0))
+                            {
+                                aliveCount++;
+                            }
+                            else if (i != 0 || j != 0)
+                                deadCount++;
+                        }
+                    }
                     if (IsAlive(BoardState[row, column]) && aliveCount <= 1 || IsAlive(BoardState[row, column]) && aliveCount >= 3)
                     {
 
@@ -157,6 +115,8 @@ namespace GameOfLife
                         NewBoardState[row, column] = BoardState[row, column];
                     }
 
+
+
                 }
             }
             BoardState = NewBoardState;
@@ -168,3 +128,60 @@ namespace GameOfLife
         }
     }
 }
+
+
+
+
+/*
+if (IsAlive(BoardState[row - 1, column - 1]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row - 1, column]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row - 1, column + 1]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row, column + 1]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row + 1, column + 1]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row + 1, column]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row + 1, column - 1]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+if (IsAlive(BoardState[row, column - 1]))
+{
+    aliveCount++;
+}
+else
+    deadCount++;
+*/
+// add up the alive cells
+
+// add up the dead cells
