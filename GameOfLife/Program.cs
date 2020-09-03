@@ -7,7 +7,7 @@ namespace GameOfLife
     {
         static void Main(string[] args)
         {
-            Board board = new Board(5, 5);
+            Board board = new Board(25, 25);
             board.PrintBoardState();
         }
     }
