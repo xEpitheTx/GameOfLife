@@ -17,7 +17,7 @@ namespace GameOfLife
             InitializeBoardState();
         }
 
-        public int[,] InitializeBoardState()
+        private int[,] InitializeBoardState()
         {
             //Alive = 1, dead = 0
             BoardState = new int[Height, Width];
@@ -57,14 +57,12 @@ namespace GameOfLife
             Console.WriteLine();
         }
 
-
         /// <summary>
         /// Any live cell with 0 or 1 live neighbors becomes dead
         /// Any live cell with 2 or 3 live neighbors stays alive
         /// Any live cell with more than 3 live neighbors becomes dead
         /// Any dead cell with exactly 3 live neighbors becomes alive
         /// </summary>
-        /// 
         public void NextBoardState()
         {
             CheckAllDirections();
@@ -78,9 +76,7 @@ namespace GameOfLife
                 for (int column = 1; column < Width - 1; column++)
                 {
                     int aliveCount = 0;
-                    int deadCount = 0;
                     // loop through all surrounding cells from given starting index
-
                     for (int i = -1; i <= 1; i++)
                     {
                         for (int j = -1; j <= 1; j++)
@@ -89,37 +85,31 @@ namespace GameOfLife
                             {
                                 aliveCount++;
                             }
-                            else if (i != 0 || j != 0)
-                                deadCount++;
                         }
                     }
-                    if (IsAlive(BoardState[row, column]) && aliveCount <= 1 || IsAlive(BoardState[row, column]) && aliveCount >= 3)
-                    {
-
-                        // Any live cell with 0 or 1 live neighbors becomes dead
-                        // Any live cell with more than 3 live neighbors becomes dead
-                        NewBoardState[row, column] = 0;
-                        // Any live cell with 2 or 3 live neighbors stays alive
-                        //do nothing since it's already alive
-                    }
-                    // Any dead cell with exactly 3 live neighbors becomes alive
-
-
-                    else if (!IsAlive(BoardState[row, column]) && aliveCount == 3)
-                    {
-                        NewBoardState[row, column] = 1;
-                    }
-
-                    else
-                    {
-                        NewBoardState[row, column] = BoardState[row, column];
-                    }
-
-
-
+                    ProcessDeathsOrBirths(row, column, aliveCount);
                 }
             }
             BoardState = NewBoardState;
+        }
+
+        private void ProcessDeathsOrBirths(int row, int column, int aliveCount)
+        {
+            // if aliveCount isn't 2 or 3, cell dies
+            if (IsAlive(BoardState[row, column]) && aliveCount < 2 || IsAlive(BoardState[row, column]) && aliveCount > 3)
+            {
+                NewBoardState[row, column] = 0;
+            }
+            // if dead cell has 3 live neighbors, it becomes alive.
+            else if (!IsAlive(BoardState[row, column]) && aliveCount == 3)
+            {
+                NewBoardState[row, column] = 1;
+            }
+            // otherwise just take what was originally on the board.
+            else
+            {
+                NewBoardState[row, column] = BoardState[row, column];
+            }
         }
 
         private bool IsAlive(int value)

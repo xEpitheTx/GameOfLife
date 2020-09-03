@@ -8,8 +8,7 @@ namespace GameOfLife
     {
         static void Main(string[] args)
         {
-            Board board = new Board(15, 15);
-            /*
+            Board board = new Board(25, 25);
             while (true)
             {
                 board.PrintBoardState();
@@ -17,9 +16,9 @@ namespace GameOfLife
                 board.NextBoardState();
                 Console.Clear();
             }
-            */
 
             
+            /*
             //testing pattern
             board.PrintBoardState();
             Thread.Sleep(300);
@@ -42,6 +41,7 @@ namespace GameOfLife
             board.NextBoardState();
             //Console.Clear();
             board.PrintBoardState();
+            */
             
         }
     }
