@@ -13,7 +13,7 @@ namespace GameOfLife
             int height = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Enter width");
             int width = Convert.ToInt32(Console.ReadLine());
-            Board board = new Board(25, 25);
+            Board board = new Board(height, width);
             while (true)
             {
                 board.PrintBoardState();
