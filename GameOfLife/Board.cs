@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace GameOfLife
@@ -9,9 +10,18 @@ namespace GameOfLife
         public int Height { get; private set; }
         public int Width { get; private set; }
         private int[,] BoardState;
-        private int[,] NewBoardState;
-        public Board(int height, int width)
+        private Random random;
+
+        public Board(int height, int width, int? randomSeed = null)
         {
+            if (randomSeed == null)
+            {
+                random = new Random();
+            }
+            else
+            {
+                random = new Random((int)randomSeed);
+            }
             Height = height;
             Width = width;
             InitializeBoardState();
@@ -21,7 +31,7 @@ namespace GameOfLife
         {
             //Alive = 1, dead = 0
             BoardState = new int[Height, Width];
-            Random random = new Random(1);
+
             int cellState;
             for (int cellRow = 0; cellRow < Height; cellRow++)
             {
@@ -36,7 +46,6 @@ namespace GameOfLife
 
         public void PrintBoardState()
         {
-            //Console.BackgroundColor = ConsoleColor.Blue;
             for (int cellRow = 0; cellRow < Height; cellRow++)
             {
                 for (int cellColumn = 0; cellColumn < Width; cellColumn++)
@@ -64,25 +73,20 @@ namespace GameOfLife
         /// Any live cell with more than 3 live neighbors becomes dead
         /// Any dead cell with exactly 3 live neighbors becomes alive
         /// </summary>
-        public void NextBoardState()
+        public void NextState()
         {
-            NewBoardState = new int[Height, Width];
-            CheckAllCells();
-            BoardState = NewBoardState;
-        }
-
-        private void CheckAllCells()
-        {
+            int[,] newBoardState = new int[Height, Width];
             for (int row = 0; row < Height; row++)
             {
                 for (int column = 0; column < Width; column++)
                 {
-                    ProcessRelativeCell(row, column);
+                    newBoardState[row, column] = GetNextCellState(row, column);
                 }
             }
+            BoardState = newBoardState;
         }
 
-        private void ProcessRelativeCell(int row, int column)
+        private int GetNextCellState(int row, int column)
         {
             int aliveCount = 0;
             // loop through all surrounding cells from given starting index
@@ -90,35 +94,37 @@ namespace GameOfLife
             int rowUpper = Math.Min(Height - 1, row + 1);
             int colLower = Math.Max(0, column - 1);
             int colUpper = Math.Min(Width - 1, column + 1);
-            for (int i = rowLower; i <= rowUpper; i++)
+            for (int relativeRow = rowLower; relativeRow <= rowUpper; relativeRow++)
             {
-                for (int j = colLower; j <= colUpper; j++)
+                for (int relativeColumn = colLower; relativeColumn <= colUpper; relativeColumn++)
                 {
-                    if (IsAlive(BoardState[i, j]) && (i != row || j != column))
+                    if (IsAlive(BoardState[relativeRow, relativeColumn]) && (relativeRow != row || relativeColumn != column))
                     {
                         aliveCount++;
                     }
                 }
             }
-            ProcessDeathsOrBirths(row, column, aliveCount);
+            return GetDeathsAndBirths(row, column, aliveCount);
         }
 
-        private void ProcessDeathsOrBirths(int row, int column, int aliveCount)
+        private int GetDeathsAndBirths(int row, int column, int aliveCount)
         {
             // if aliveCount isn't 2 or 3, cell dies
-            if (IsAlive(BoardState[row, column]) && aliveCount < 2 || IsAlive(BoardState[row, column]) && aliveCount > 3)
+            int cell = BoardState[row, column];
+            if (IsAlive(cell) && aliveCount < 2 || IsAlive(cell) && aliveCount > 3)
             {
-                NewBoardState[row, column] = 0;
+                //return this instead
+                return 0;
             }
             // if dead cell has 3 live neighbors, it becomes alive.
             else if (!IsAlive(BoardState[row, column]) && aliveCount == 3)
             {
-                NewBoardState[row, column] = 1;
+                return 1;
             }
             // otherwise just take what was originally on the board.
             else
             {
-                NewBoardState[row, column] = BoardState[row, column];
+                return BoardState[row, column];
             }
         }
 
@@ -126,83 +132,18 @@ namespace GameOfLife
         {
             return value == 1;
         }
+
+        public Bitmap GetImage()
+        {
+            Bitmap image = new Bitmap(Height, Width);
+            for (int row = 0; row < Height - 1; row++)
+            {
+                for (int column = 0; column < Width - 1; column++)
+                {
+                    image.SetPixel(row, column, BoardState[row, column] == 1 ? Color.White : Color.Black);
+                }
+            }
+            return image;
+        }
     }
 }
-
-/*
-        private void CheckTopRow()
-        {
-            for (int column = 1; column < Width - 2; column++)
-            {
-                int aliveCount = 0;
-                for (int rowToCheck = 0; rowToCheck < 2; rowToCheck++)
-                {
-                    for (int columnToCheck = 0; columnToCheck < 3; columnToCheck++)
-                    {
-                        if (IsAlive(BoardState[rowToCheck, column + columnToCheck]) && (rowToCheck != 0 || columnToCheck != 0))
-                        {
-                            aliveCount++;
-                        }
-                    }
-                }
-                ProcessDeathsOrBirths(0, column, aliveCount);
-            }
-        }
-#warning In testing, I don't think dead cells are flipping to live
-        private void CheckBottomRow()
-        {
-            for (int column = 1; column < Width - 1; column++)
-            {
-                int aliveCount = 0;
-                for (int rowToCheck = Height - 1; rowToCheck > Height - 2; rowToCheck--)
-                {
-                    for (int columnToCheck = -1; columnToCheck < 2; columnToCheck++)
-                    {
-                        if (IsAlive(BoardState[Height - rowToCheck, column + columnToCheck]) && (rowToCheck != Height - 1 || columnToCheck != 0))
-                        {
-                            aliveCount++;
-                        }
-                    }
-                }
-                ProcessDeathsOrBirths(Height - 1, column, aliveCount);
-            }
-        }
-
-        private void CheckLeftColumn()
-        {
-            for (int row = 1; row < Height - 2; row++)
-            {
-                int aliveCount = 0;
-                for (int rowToCheck = -1; rowToCheck < 2; rowToCheck++)
-                {
-                    for (int columnToCheck = 0; columnToCheck < 2; columnToCheck++)
-                    {
-                        if (IsAlive(BoardState[row + rowToCheck, columnToCheck]) && (rowToCheck != 0 || columnToCheck != 0))
-                        {
-                            aliveCount++;
-                        }
-                    }
-                }
-                ProcessDeathsOrBirths(row, 0, aliveCount);
-            }
-        }
-#warning In testing, I don't think dead cells are flipping to live
-        private void CheckRightColumn()
-        {
-            for (int row = 1; row < Height - 2; row++)
-            {
-                for (int rowToCheck = -1; rowToCheck < 2; rowToCheck++)
-                {
-                    int aliveCount = 0;
-                    for (int columnToCheck = Width - 1; columnToCheck >= Width - 2; columnToCheck--)
-                    {
-                        if (IsAlive(BoardState[row + rowToCheck, columnToCheck]) && (rowToCheck != 0 || columnToCheck != Width - 1))
-                        {
-                            aliveCount++;
-                        }
-                    }
-                    ProcessDeathsOrBirths(row, Width - 1, aliveCount);
-                }
-            }
-        }
-*/
