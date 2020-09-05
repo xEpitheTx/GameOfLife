@@ -62,9 +62,7 @@ namespace GameOfLife
                         Console.Write("▉ ");
                     }
                 }
-                Console.WriteLine();
             }
-            Console.WriteLine();
         }
 
         /// <summary>
